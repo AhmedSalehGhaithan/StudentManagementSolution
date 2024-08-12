@@ -1,0 +1,50 @@
+﻿@page "/AddCountry"
+<h3>Update  Student</h3>
+@rendermode InteractiveAuto
+<hr />
+<div class="row">
+    <div class="col-md-12">
+        <EditForm Model="CountryObject" OnValidSubmit="CreateCountry" FormName="AddCountry">
+            <DataAnnotationsValidator />
+            <div class="col-md-12">
+                <div class="row">
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="control-label">Country Name</label>
+                            <InputText class="form-control" for="Code" @bind-Value="CountryObject.Name" />
+                            <ValidationMessage For="()=>CountryObject.Name" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="control-label">Country Code</label>
+                            <InputText class="form-control" for="MiddleName" @bind-Value="CountryObject.Code" />
+                            <ValidationMessage For="()=>CountryObject.Code" />
+                        </div>
+                    </div>
+
+                </div>
+                <div class="form-group mt-4">
+                    <button type="submit" class="btn btn-primary">Save Student</button>
+                    @* <button class="btn btn-danger" @onclick="() => Cancel()"> Cancel</button> *@
+
+                </div>
+    
+            </div>
+        </EditForm>
+    </div>
+</div>
+@code {
+
+    [SupplyParameterFromForm]
+    public CountryTable CountryObject { get; set; } = new();
+    [Parameter] public int Id { get; set; }
+
+
+    protected async Task CreateCountry()
+    {
+        
+    }
+}

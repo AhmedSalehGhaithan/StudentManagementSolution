@@ -1,0 +1,86 @@
+﻿@page "/Country-list"
+@rendermode InteractiveAuto
+<div class="container">
+    <div class="row">
+        <p><a class="btn btn-success float-end" href="/AddCountry">Add New Country</a></p>
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    @if (!AllCountries.Any())
+                    {
+                        <p><em>Loading Countries ....</em></p>
+                    }
+                    @if (AllCountries.Any())
+                    {
+                        <div class="card-body">
+                            <table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Id</th>
+                                        <th>Country Name</th>
+                                        <th>Country Code</th>
+                                        <th>Edit</th>
+                                        <th>Delete</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var student in AllCountries)
+                                    {
+                                        <tr>
+                                            <td>@student.Id</td>
+                                            <td>@student.Name</td>
+                                            <td>@student.Code</td>
+
+                                            <td>
+                                                <a class="btn btn-success" href="/StudentManager/@student.Id">Edit</a>
+                                            </td>
+                                            <td>
+                                                <a class="btn btn-danger" @onclick="() => DeleteStudent(student.Id)">Delete</a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info"> There is not students list available </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@code {
+    List<CountryTable> AllCountries { get; set; } = new();
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAllCountries();
+    }
+    public async Task LoadAllCountries()
+    {
+        var countries = await _countryService.GetAllCountriesAsync();
+        AllCountries.Clear();
+        if (countries is null) return;
+        foreach (var country in countries)
+        {
+            AllCountries.Add(country);
+        }
+    }
+
+    private void EditStudent(int Id)
+    {
+        _navagtionManager.NavigateTo($"/student/edit/{Id}");
+    }
+
+    private async Task DeleteStudent(int Id)
+    {
+        var confirmDelete = await _js.InvokeAsync<bool>("confirm", "Are you sure you want to delete this student?");
+        if (confirmDelete)
+        {
+            var student = await _countryService.DeleteCountryAsync(Id);
+            await LoadAllCountries();
+        }
+    }
+}

@@ -1,0 +1,113 @@
+﻿@page "/StudentManager/{Id:int?}"
+<h3>Update  Student</h3>
+@rendermode InteractiveAuto
+<hr />
+<div class="row">
+    <div class="col-md-12">
+        <EditForm Model="studentObject" OnValidSubmit="UpdateStudent" FormName="updateStudent">
+            <DataAnnotationsValidator />
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="control-label">First Name</label>
+                            <InputText class="form-control" for="FirstName" @bind-Value="studentObject.FirstName" />
+                            <ValidationMessage For="()=>studentObject.FirstName" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="control-label">Middle Name</label>
+                            <InputText class="form-control" for="MiddleName" @bind-Value="studentObject.MiddleName" />
+                            <ValidationMessage For="()=>studentObject.MiddleName" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="control-label">Last Name</label>
+                            <InputText class="form-control" for="LastName" @bind-Value="studentObject.LastName" />
+                            <ValidationMessage For="()=>studentObject.LastName" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="control-label">Email Address</label>
+                            <InputText class="form-control" for="EmailAddress" @bind-Value="studentObject.EmailAddress" />
+                            <ValidationMessage For="()=>studentObject.EmailAddress" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="control-label"> Address</label>
+                            <InputText class="form-control" for="Address" @bind-Value="studentObject.Address" />
+                            <ValidationMessage For="()=>studentObject.Address" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="control-label">Country</label>
+                            <InputText class="form-control" for="Country" @bind-Value="studentObject.Country" />
+                            <ValidationMessage For="()=>studentObject.Country" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="control-label">Phone Number</label>
+                            <InputText class="form-control" for="PhoneNumber" @bind-Value="studentObject.PhoneNumber" />
+                            <ValidationMessage For="()=>studentObject.PhoneNumber" />
+                        </div>
+                    </div>
+
+                </div>
+                <div class="form-group mt-4">
+                    <button type="submit" class="btn btn-primary">Save Student</button>
+                    <button class="btn btn-danger" @onclick="() => Cancel()"> Cancel</button>
+
+                </div>
+
+            </div>
+        </EditForm>
+    </div>
+</div>
+@code {
+
+    [SupplyParameterFromForm]
+    public StudentTable studentObject { get; set; } = new();
+    [Parameter] public int Id { get; set; }
+
+    protected async Task UpdateStudent()
+    {
+        if (Id > 0)
+        {
+            var result = await _studentService.UpdateStudentAsync(studentObject);
+        }
+        else
+        {
+            var result = await _studentService.AddStudentAsync(studentObject);
+        }
+       
+        
+        _navagtionManager.NavigateTo("/student-list");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if(Id >0)
+        await LoadStudent();
+    }
+    public async Task LoadStudent()
+    {
+         studentObject = await _studentService.GetStudentByIdAsync(Id);
+    }
+    public void Cancel()
+    {
+        _navagtionManager.NavigateTo("/student-list");
+    }
+
+}

@@ -1,0 +1,92 @@
+﻿@page "/Student-list"
+@rendermode InteractiveAuto
+<div class="container">
+    <div class="row">
+        <p><a class="btn btn-success float-end" href="/StudentManager">Add New Student</a></p>
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    @if (!AllStudent.Any())
+                    {
+                        <p><em>Loading Students ....</em></p>
+                    }
+                    @if (AllStudent.Any())
+                    {
+                        <div class="card-body">
+                            <table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Id</th>
+                                        <th>First Name</th>
+                                        <th>Middle Name</th>
+                                        <th>Last Name</th>
+                                        <th>Email</th>
+                                        <th>PhoneNo</th>
+                                        <th>Edit</th>
+                                        <th>Delete</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach(var student in AllStudent)
+                                    {
+                                        <tr>
+                                            <td>@student.Id</td>
+                                            <td>@student.FirstName</td>
+                                            <td>@student.MiddleName</td>
+                                            <td>@student.LastName</td>
+                                            <td>@student.EmailAddress</td>
+                                            <td>@student.PhoneNumber</td>
+
+                                            <td>
+                                                <a class="btn btn-success" href="/StudentManager/@student.Id">Edit</a>
+                                            </td> 
+                                            <td>
+                                                <a class="btn btn-danger" @onclick="() => DeleteStudent(student.Id)">Delete</a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info"> There is not students list available </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@code {
+    List<StudentTable> AllStudent { get; set; } = new();
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadStudent();
+    }
+    public async Task LoadStudent()
+    {
+        var students = await _studentService.GetAllStudentsAsync();
+        AllStudent.Clear();
+        if (students is null) return;
+        foreach(var student in students)
+        {
+            AllStudent.Add(student);
+        }
+    }
+
+    private  void EditStudent(int Id)
+    {
+        _navagtionManager.NavigateTo($"/student/edit/{Id}");
+    }
+
+    private async Task DeleteStudent(int Id)
+    {
+        var confirmDelete = await _js.InvokeAsync<bool>("confirm", "Are you sure you want to delete this student?");
+        if (confirmDelete)
+        {
+            var student = await _studentService.DeleteStudentAsync(Id);
+            await LoadStudent();
+        }
+    }
+}
